@@ -1,33 +1,35 @@
 import sys
 
 from libs.args import process_args
-from libs.config import init_config
-from commands.add import add
+from libs.config import init_config, check_config, read_config, vprint
+from commands.add import *
 
-GLOBAL_OPTIONS = [
-        ["v", "verbose"],
-        ["d", "dry-run"],
-        ["D", "data-dir"],
-        ["C", "config-dir"],
-        ]
+def verbose_arg_print(command, cmd_opts, cmd_args, config):
+    vprint(config, "command: " + command)
+    vprint(config, "command options: " + ", ".join(cmd_opts))
+    vprint(config, "command arguments: " + ", ".join(cmd_args))
+    vprint(config, "Config:")
+    for key, value in config.items():
+        vprint(config, f"{key} : {value}")
 
 def main():
 
+# ccmanager
 
     command = ""
     cmd_opts = []
     cmd_args = []
 
-    config_pack = init_config()
+    # returns (def_config_dict, alias_dict)
+    config, alias = init_config()
 
-    (command, cmd_opts, cmd_args) = process_args(config_pack)
+    read_config(config)
 
-    config, _ = config_pack
+    (command, cmd_opts, cmd_args) = process_args(config, alias)
 
-    print(config)
-    print(command)
-    print(cmd_opts)
-    print(cmd_args)
+    verbose_arg_print(command, cmd_opts, cmd_args, config)
+
+    check_config(config)
 
     match command:
 

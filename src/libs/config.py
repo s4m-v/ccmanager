@@ -1,3 +1,14 @@
+def vprint(config, msg):
+
+    if config["verbose"]:
+        print("verbose: " + msg)
+
+def read_config(config):
+    pass
+
+def check_config(config):
+    pass
+
 def init_config():
 
     config = {}

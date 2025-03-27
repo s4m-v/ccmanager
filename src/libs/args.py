@@ -2,11 +2,11 @@
 
 import sys
 
-def check_options(options, CMD_OPTIONS, GLOBALS_OPTIONS):
+def check_cmd_options(opts, CMD_OPTIONS):
 
-    for option in options:
+    for opt in opts:
 
-        if option in CMD_OPTIONS or option in GLOBALS_OPTIONS:
+        if opt in CMD_OPTIONS:
             continue
         else:
             return False
@@ -48,9 +48,7 @@ def process_alias_opt(opt, cmd_opts, config, alias):
     return False, ""
 
 
-def process_option(opt, cmd_opts, config_pack):
-
-    config, alias = config_pack
+def process_option(opt, cmd_opts, config, alias):
 
     if opt[0:2] == "--":
         return process_full_opt(opt, cmd_opts, config)
@@ -58,13 +56,13 @@ def process_option(opt, cmd_opts, config_pack):
     return process_alias_opt(opt, cmd_opts, config, alias)
 
 
-def process_args(config_pack):
+def process_args(config, alias):
 
 # Argument Structure
 # ccmanager [options] command [rest of args]
 
 # will return tuple in this format:
-# ("command", [options, ...], ["rest of args", ...])
+# ("command", [command options, ...], [command args, ...])
 
     args_len = len(sys.argv)
 
@@ -78,9 +76,22 @@ def process_args(config_pack):
     cmd_opts = []
     cmd_args = []
 
+    # The Arg Process Loop
+
+    # This loop checks to see what
+    # kind of arg it is in this order:
+
+    # option arg
+    # option
+    # command
+    # command arg
+
+    # This loop uses a boolean to take next arg
+    # if the previous option requires it's own arg
+
+
     config_read = False
     config_entry = ""
-    config, _ = config_pack
 
     for arg in args:
 
@@ -90,7 +101,7 @@ def process_args(config_pack):
             continue
 
         if arg[0] == '-':
-            config_read, config_entry = process_option(arg, cmd_opts, config_pack)
+            config_read, config_entry = process_option(arg, cmd_opts, config, alias)
             continue
 
         if not command:
