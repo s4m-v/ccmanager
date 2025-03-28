@@ -1,8 +1,9 @@
 import sys
+import os.path
 
 from libs.args import process_args
 from libs.config import init_config, check_config, read_config, vprint
-from commands.add import *
+from commands.add import add
 
 def verbose_arg_print(command, cmd_opts, cmd_args, config):
     vprint(config, "command: " + command)
@@ -23,7 +24,8 @@ def main():
     # returns (def_config_dict, alias_dict)
     config, alias = init_config()
 
-    read_config(config)
+    vprint(config, "Checking for config at default location:")
+    read_config(config, os.path.expandvars("$HOME/.config/ccmanager"))
 
     (command, cmd_opts, cmd_args) = process_args(config, alias)
 

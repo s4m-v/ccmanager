@@ -2,11 +2,24 @@
 
 import sys
 
+from config import read_config
+
 def check_cmd_options(opts, CMD_OPTIONS):
 
     for opt in opts:
 
         if opt in CMD_OPTIONS:
+            continue
+        else:
+            return False
+
+    return True
+
+def check_cmd_arguments(args, CMD_ARGUMENTS):
+
+    for arg in args:
+
+        if arg in CMD_ARGUMENTS:
             continue
         else:
             return False
@@ -28,7 +41,6 @@ def process_full_opt(opt, cmd_opts, config):
         cmd_opts.append(full_opt)
         return False, ""
 
-
 def process_alias_opt(opt, cmd_opts, config, alias):
 
     alias_opt = opt[1:]
@@ -46,15 +58,6 @@ def process_alias_opt(opt, cmd_opts, config, alias):
         cmd_opts.append(char)
 
     return False, ""
-
-
-def process_option(opt, cmd_opts, config, alias):
-
-    if opt[0:2] == "--":
-        return process_full_opt(opt, cmd_opts, config)
-
-    return process_alias_opt(opt, cmd_opts, config, alias)
-
 
 def process_args(config, alias):
 
@@ -76,6 +79,16 @@ def process_args(config, alias):
     cmd_opts = []
     cmd_args = []
 
+    try:
+        conf_arg_index = args.index("--config-dir")
+        read_config(config, args[conf_arg_index + 1])
+
+        args.remove(args[conf_arg_index])
+        args.remove(args[conf_arg_index + 1])
+
+    except (ValueError, IndexError):
+        pass
+
     # The Arg Process Loop
 
     # This loop checks to see what
@@ -90,18 +103,24 @@ def process_args(config, alias):
     # if the previous option requires it's own arg
 
 
-    config_read = False
+    is_config_arg = False
     config_entry = ""
 
     for arg in args:
 
-        if config_read:
+        if is_config_arg:
             config[config_entry] = arg
-            config_read = False
+            is_config_arg = False
             continue
 
         if arg[0] == '-':
-            config_read, config_entry = process_option(arg, cmd_opts, config, alias)
+
+            if arg[1] == "-":
+                is_config_arg, config_entry = \
+                        process_full_opt(arg, cmd_opts, config)
+            else:
+                is_config_arg, config_entry = \
+                        process_alias_opt(arg, cmd_opts, config, alias)
             continue
 
         if not command:
@@ -110,8 +129,8 @@ def process_args(config, alias):
 
         cmd_args.append(arg)
 
-    if config_read:
-        print(config_entry + ": missing input")
+    if is_config_arg or not command:
+        print("Error: Missing Input")
         sys.exit(1)
 
     return (command, cmd_opts, cmd_args)
