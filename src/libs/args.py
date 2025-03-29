@@ -1,8 +1,12 @@
 #TODO deal with duplicate options
 
 import sys
+import os.path
 
-from config import read_config
+from libs.config import init_config, read_config, vprint
+
+#TODO move these two functions to generic command function
+#     in commands folder
 
 def check_cmd_options(opts, CMD_OPTIONS):
 
@@ -52,6 +56,7 @@ def process_alias_opt(opt, cmd_opts, config, alias):
 
         if char in alias:
             if alias[char] in config:
+
                 config[alias[char]] = True
                 continue
 
@@ -59,7 +64,7 @@ def process_alias_opt(opt, cmd_opts, config, alias):
 
     return False, ""
 
-def process_args(config, alias):
+def process_args():
 
 # Argument Structure
 # ccmanager [options] command [rest of args]
@@ -79,15 +84,27 @@ def process_args(config, alias):
     cmd_opts = []
     cmd_args = []
 
+    config, alias = init_config()
+
+    # Checking for config dir arg
+    conf_arg_index = 0
+
     try:
         conf_arg_index = args.index("--config-dir")
-        read_config(config, args[conf_arg_index + 1])
+        conf_arg_value = args[conf_arg_index + 1]
+        read_config(config, conf_arg_value)
 
-        args.remove(args[conf_arg_index])
-        args.remove(args[conf_arg_index + 1])
+        args.remove("--config-dir")
+        args.remove(conf_arg_value)
 
-    except (ValueError, IndexError):
+    except ValueError:
         pass
+    except IndexError:
+        print("Error: Missing config arg!")
+        sys.exit(1)
+
+    if not conf_arg_index:
+        read_config(config, os.path.expandvars("$HOME/.config/ccmanager"))
 
     # The Arg Process Loop
 
@@ -133,4 +150,4 @@ def process_args(config, alias):
         print("Error: Missing Input")
         sys.exit(1)
 
-    return (command, cmd_opts, cmd_args)
+    return (command, cmd_opts, cmd_args, config)

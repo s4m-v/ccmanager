@@ -5,23 +5,40 @@ def vprint(config, msg):
     if config["verbose"]:
         print("verbose: " + msg)
 
+def check_config(config):
+
+    if not os.path.exists(config["data-dir"]):
+        os.makedirs(config["data-dir"], exist_ok=True)
+
 def process_file(config, file):
 
+
     for line in file:
+        
     
-        if line.strip():
+        if line.isspace():
             continue
     
         try:
     
-            entry = line[0:line.index(':')].rstrip(" \n\t")
-            value = line[line.index(':') + 1:].rstrip(" \n\t")
+            entry = line[0:line.index(':')].strip(" \n\t")
+            value = line[line.index(':') + 1:].strip(" \n\t")
+
+            if not entry in config:
+                raise ValueError
+
+            if value == "yes":
+                value = True
+            if value == "no":
+                value = False
+
+            if not type(value) is type(config[entry]):
+                raise ValueError
     
             config[entry] = value
     
         except (ValueError, IndexError):
-    
-            vprint(config, "Invalid config entry, skipping...")
+            print("Invalid config entry: " + line)
             continue
 
 def read_config(config, path):
@@ -34,16 +51,11 @@ def read_config(config, path):
             process_file(config, file)
 
     except FileNotFoundError:
-        vprint(config, "File not Found!")
         return
     except PermissionError:
-        vprint(config, "Insufficent Permissions!")
         return
 
-def check_config(config):
-
-    if not os.path.exists(config["data-dir"]):
-        os.makedirs(config["data-dir"], exist_ok=True)
+    check_config(config)
 
 def init_config():
 

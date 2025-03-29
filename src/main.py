@@ -1,8 +1,7 @@
 import sys
-import os.path
 
 from libs.args import process_args
-from libs.config import init_config, check_config, read_config, vprint
+from libs.config import vprint
 from commands.add import add
 
 def verbose_arg_print(command, cmd_opts, cmd_args, config):
@@ -11,7 +10,7 @@ def verbose_arg_print(command, cmd_opts, cmd_args, config):
     vprint(config, "command arguments: " + ", ".join(cmd_args))
     vprint(config, "Config:")
     for key, value in config.items():
-        vprint(config, f"{key} : {value}")
+        vprint(config, f"\t{key} : {value}")
 
 def main():
 
@@ -20,18 +19,11 @@ def main():
     command = ""
     cmd_opts = []
     cmd_args = []
+    config = {}
 
-    # returns (def_config_dict, alias_dict)
-    config, alias = init_config()
-
-    vprint(config, "Checking for config at default location:")
-    read_config(config, os.path.expandvars("$HOME/.config/ccmanager"))
-
-    (command, cmd_opts, cmd_args) = process_args(config, alias)
+    (command, cmd_opts, cmd_args, config) = process_args()
 
     verbose_arg_print(command, cmd_opts, cmd_args, config)
-
-    check_config(config)
 
     match command:
 
