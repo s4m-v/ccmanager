@@ -3,32 +3,10 @@
 import sys
 import os.path
 
-from libs.config import init_config, read_config, vprint
+from libs.config import init_config, read_config
 
 #TODO move these two functions to generic command function
 #     in commands folder
-
-def check_cmd_options(opts, CMD_OPTIONS):
-
-    for opt in opts:
-
-        if opt in CMD_OPTIONS:
-            continue
-        else:
-            return False
-
-    return True
-
-def check_cmd_arguments(args, CMD_ARGUMENTS):
-
-    for arg in args:
-
-        if arg in CMD_ARGUMENTS:
-            continue
-        else:
-            return False
-
-    return True
 
 def process_full_opt(opt, cmd_opts, config):
     

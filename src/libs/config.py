@@ -1,7 +1,6 @@
-import os.path
+import os
 
 def vprint(config, msg):
-
     if config["verbose"]:
         print("verbose: " + msg)
 
