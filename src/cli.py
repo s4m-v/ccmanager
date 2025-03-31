@@ -3,31 +3,32 @@
 import sys
 import os.path
 
-from libs.config import init_config, read_config
+from config import init_config, read_config, vprint
+from commands.add import add
 
 #TODO move these two functions to generic command function
 #     in commands folder
 
-def process_full_opt(opt, cmd_opts, config):
+def process_full_opt(opt, config):
     
         full_opt = opt[2:]
 
         if full_opt in config:
 
-            if "dir" in full_opt: 
+            if full_opt in config["requires_arg"]: 
                 return True, full_opt
             
             config[full_opt] = True
             return False, ""
+        else:
+            print("Error: --" + full_opt + " is invalid.")
+            sys.exit(1)
 
-        cmd_opts.append(full_opt)
-        return False, ""
-
-def process_alias_opt(opt, cmd_opts, config, alias):
+def process_alias_opt(opt, config, alias):
 
     alias_opt = opt[1:]
 
-    if len(alias_opt) == 1 and alias_opt.isupper():
+    if len(alias_opt) == 1 and alias[alias_opt] in config["requires_arg"]:
         return True, alias[alias_opt]
 
     for char in alias_opt:
@@ -37,12 +38,13 @@ def process_alias_opt(opt, cmd_opts, config, alias):
 
                 config[alias[char]] = True
                 continue
-
-        cmd_opts.append(char)
+        else:
+            print("Error: -" + char + " is invalid.")
+            sys.exit(1)
 
     return False, ""
 
-def process_args():
+def init_cli():
 
 # Argument Structure
 # ccmanager [options] command [rest of args]
@@ -59,7 +61,6 @@ def process_args():
     args = sys.argv[1:]
 
     command = ""
-    cmd_opts = []
     cmd_args = []
 
     config, alias = init_config()
@@ -112,10 +113,10 @@ def process_args():
 
             if arg[1] == "-":
                 is_config_arg, config_entry = \
-                        process_full_opt(arg, cmd_opts, config)
+                        process_full_opt(arg, config)
             else:
                 is_config_arg, config_entry = \
-                        process_alias_opt(arg, cmd_opts, config, alias)
+                        process_alias_opt(arg, config, alias)
             continue
 
         if not command:
@@ -128,4 +129,31 @@ def process_args():
         print("Error: Missing Input")
         sys.exit(1)
 
-    return (command, cmd_opts, cmd_args, config)
+    return (command, cmd_args, config)
+
+def verbose_arg_print(command, cmd_args, config):
+    vprint(config, "command: " + command)
+    vprint(config, "command arguments: " + ", ".join(cmd_args))
+    vprint(config, "Config:")
+    for key, value in config.items():
+        if key in "requires_arg": continue
+        vprint(config, f"\t{key} : {value}")
+
+def main_cli():
+
+    command = ""
+    cmd_args = []
+    config = {}
+
+    (command, cmd_args, config) = init_cli()
+
+    verbose_arg_print(command, cmd_args, config)
+
+    match command:
+
+        case "add":
+            add(cmd_args, config)
+
+        case _:
+            print("Unknown Command")
+            sys.exit(1)

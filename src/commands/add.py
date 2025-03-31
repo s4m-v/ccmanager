@@ -4,8 +4,7 @@ import shutil
 import subprocess
 import time
 
-from commands.helper import *
-from libs.config import vprint
+from config import vprint
 
 # Add new calendar
 
@@ -19,8 +18,6 @@ from libs.config import vprint
 # calcurse data directory
 # syncdb
 # calcurse-caldav config
-
-COMMAND_OPTIONS = []
 
 def gen_calcurse_data(path):
 
@@ -48,9 +45,8 @@ def check_args(args):
             print("Error: Too many args")
             sys.exit(1)
 
-def add(opts, args, config):
+def add(args, config):
 
-    check_opts(opts, COMMAND_OPTIONS)
     check_args(args)
 
     cal_name = args[0]

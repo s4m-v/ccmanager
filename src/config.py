@@ -1,4 +1,5 @@
 import os
+import sys
 
 def vprint(config, msg):
     if config["verbose"]:
@@ -9,11 +10,13 @@ def check_config(config):
     if not os.path.exists(config["data-dir"]):
         os.makedirs(config["data-dir"], exist_ok=True)
 
+    if not config["init-type"] in ["keep-local", "keep-remote", "twoway"]:
+        print("Error: Config: invalid init-type")
+        sys.exit(1)
+
 def process_file(config, file):
 
-
     for line in file:
-        
     
         if line.isspace():
             continue
@@ -60,6 +63,7 @@ def init_config():
 
     config = {}
     alias = {}
+    requires_arg = []
     
     config["verbose"] = False
     alias["v"] = "verbose"
@@ -69,5 +73,12 @@ def init_config():
 
     config["data-dir"] = os.path.expandvars("$HOME/.ccmanager")
     alias["D"] = "data-dir"
+    requires_arg.append("data-dir")
+
+    config["init-type"] = "keep-remote"
+    alias["i"] = "init-type"
+    requires_arg.append("init-type")
+
+    config["requires_arg"] = requires_arg
 
     return (config, alias)
