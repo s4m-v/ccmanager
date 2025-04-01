@@ -3,8 +3,8 @@ import os
 import shutil
 import subprocess
 import time
-
-from config import vprint
+import logging
+logger = logging.getLogger(__name__)
 
 # Add new calendar
 
@@ -19,6 +19,9 @@ from config import vprint
 # syncdb
 # calcurse-caldav config
 
+def create_caldav_files(path):
+    pass
+
 def gen_calcurse_data(path):
 
     process = subprocess.Popen(["calcurse", "-D", path])
@@ -28,38 +31,33 @@ def gen_calcurse_data(path):
     process.terminate()
     process.wait()
 
-def check_args(args):
+def init_caldav(init_type):
+    pass
 
-    args_len = len(args)
+def add(args):
 
-    match args_len:
-        case 0:
-            print("ccmanager add CAL_NAME CALDAV_CONF")
-            sys.exit(1)
-        case 1:
-            print("Error: missing conf file arg")
-            sys.exit(1)
-        case 2:
-            pass
-        case _:
-            print("Error: Too many args")
-            sys.exit(1)
+    logger.info("Startig Add Subcommand!")
 
-def add(args, config):
+    # Add
 
-    check_args(args)
+    # This command will break into 3 parts
+    # 1. create file structure
+    # 2. generate calcurse data
+    # 3. run calcurse caldav init
 
-    cal_name = args[0]
-    conf_file = args[1]
+    caldav_path = ""
+    calcurse_path = ""
 
-    ccm_path = os.path.join(config["data-dir"], cal_name)
-    cc_path = os.path.join(ccm_path, "data")
+    logger.info("creating caldav directoy and files...")
+    create_caldav_files(caldav_path)
+    logger.info("done.")
 
-    os.makedirs(cc_path, exist_ok=True)
-    os.makedirs(os.path.join(ccm_path, "hook"), exist_ok=True)
-    with open(os.path.join(ccm_path, "syncdb"), 'w') : pass
-    shutil.copy(conf_file, os.path.join(ccm_path, "config"))
+    logger.info("creating calcurse directoy and files...")
+    gen_calcurse_data(calcurse_path)
+    logger.info("done.")
 
-    gen_calcurse_data(cc_path)
+    logger.info("Initializing caldav...")
+    init_caldav("twoway")
+    logger.info("done.")
 
-    #TODO init calcurse-dav sync
+    logger.info("Add Subcommand Complete!")
