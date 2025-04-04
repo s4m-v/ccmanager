@@ -1,4 +1,3 @@
-import sys
 import shutil
 import subprocess
 from pathlib import Path
@@ -36,13 +35,13 @@ def add(name, caldav_config='', dry_run=False, init_type="keep-remote",
     # 2. generate calcurse data
     # 3. run calcurse caldav init
 
-    logger.info("Starting add subcommand!")
+    logger.info("adding calendar.")
 
     cal_path = Path(os.path.expandvars(data_dir), name).resolve()
 
     if cal_path.exists():
-        logger.error("cal directory already exists")
-        sys.exit(1)
+        logger.error("cal directory already exists.")
+        return False
 
     cal_path.mkdir()
 
@@ -55,9 +54,9 @@ def add(name, caldav_config='', dry_run=False, init_type="keep-remote",
     
     if caldav_config:
 
-        caldav_config = os.path.expandvars(caldav_config)
-
         logger.info("creating caldav directoy and files...")
+
+        caldav_config = os.path.expandvars(caldav_config)
 
         if not dry_run:
             create_caldav(caldav_config, Path(cal_path, "caldav"))
@@ -69,8 +68,11 @@ def add(name, caldav_config='', dry_run=False, init_type="keep-remote",
         if not dry_run:
 
             if not sync(name, data_dir=data_dir, init_type=init_type):
+                logger.info("removing tree...")
                 shutil.rmtree(cal_path)
 
         logger.info("done.")
 
-    logger.info("Add Subcommand Complete!")
+    logger.info("calendar added.")
+
+    return True

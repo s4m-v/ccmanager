@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 def run_add(args):
 
-    commands.add(
+    return commands.add(
             args.name,
             caldav_config=args.caldav_conf,
             init_type=args.init_type,
@@ -18,32 +18,32 @@ def run_add(args):
 
 def run_backup(args):
 
-    commands.backup(
+    return commands.backup(
             args.name,
             data_dir=args.data_dir
             )
 
 def run_list(args):
-    commands.list(data_dir=args.data_dir)
+    return commands.list(data_dir=args.data_dir)
 
 
 def run_open(args):
 
-    commands.open(
+    return commands.open(
             args.name,
             data_dir=args.data_dir
             )
 
 def run_sync(args):
 
-    commands.sync(
+    return commands.sync(
             args.name,
             data_dir=args.data_dir
             )
 
 def run_remove(args):
 
-    commands.remove(
+    return commands.remove(
             args.name,
             dry_run=args.dry_run,
             data_dir=args.data_dir
@@ -120,7 +120,10 @@ def start_cli():
         logging.basicConfig()
 
     logger.info("running command.")
-    args.func(args)
+    result = args.func(args)
     logger.info("running command complete.")
 
-    logger.info("command complete.")
+    if not result:
+        sys.exit(1)
+
+    sys.exit(0)

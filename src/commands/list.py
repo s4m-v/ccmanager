@@ -6,6 +6,8 @@ logger = logging.getLogger(__name__)
 
 def list(data_dir="$HOME/.ccmanager/"):
 
+    logger.info("listing calendars.")
+
     ccm_path = Path(os.path.expandvars(data_dir))
 
     dir_list = os.listdir(ccm_path)
@@ -17,6 +19,8 @@ def list(data_dir="$HOME/.ccmanager/"):
             valid_dir_list.append(dir)
 
     print(*valid_dir_list, sep=", ")
+
+    logger.info("calendars listed.")
 
     return valid_dir_list
 

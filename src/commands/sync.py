@@ -2,13 +2,12 @@ import logging
 import subprocess
 import os
 from pathlib import Path
-import sys
 
 logger = logging.getLogger(__name__)
 
 def sync(name, data_dir="$HOME/.ccmanager/", init_type=''):
 
-    logger.info("Starting sync.")
+    logger.info("starting sync.")
 
     cal_path = Path(os.path.expandvars(data_dir), name).resolve()
     caldav_path = Path(cal_path, "caldav")
@@ -31,6 +30,7 @@ def sync(name, data_dir="$HOME/.ccmanager/", init_type=''):
         logger.info("running init caldav script.")
 
     else:
+
         logger.info("running caldav script.")
 
     result = subprocess.run(

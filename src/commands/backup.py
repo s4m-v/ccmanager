@@ -27,7 +27,7 @@ def gen_backup_path(backup_path):
 
 def backup(name, data_dir="$HOME/.ccmanager/"):
 
-    logger.info("Running Backup")
+    logger.info("starting backup.")
 
     cal_path = Path(os.path.expandvars(data_dir), name).resolve()
     backup_path = Path(cal_path, "backups")
@@ -47,7 +47,7 @@ def backup(name, data_dir="$HOME/.ccmanager/"):
 
     else:
 
-        logger.info("Everything exists.")
+        logger.info("everything exists.")
 
     logger.info("running calcurse export command...")
     result = subprocess.run(["calcurse", "-D", calcurse_path, "-x"], 
@@ -59,7 +59,7 @@ def backup(name, data_dir="$HOME/.ccmanager/"):
         logger.error("calcurse export failed:")
         logger.error(result.stderr)
 
-        sys.exit(1)
+        return False
 
 
     logger.info("done.")
@@ -70,5 +70,7 @@ def backup(name, data_dir="$HOME/.ccmanager/"):
         file.write(result.stdout)
 
     logger.info("done.")
-    logger.info("backup complete")
+
+    logger.info("backup complete.")
+    return True
 
