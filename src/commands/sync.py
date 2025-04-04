@@ -10,15 +10,17 @@ def sync(name, data_dir="$HOME/.ccmanager/", init_type=''):
 
     logger.info("Starting sync.")
 
-    cal_path = Path(os.path.expandvars(data_dir), name, "caldav").resolve()
+    cal_path = Path(os.path.expandvars(data_dir), name).resolve()
+    caldav_path = Path(cal_path, "caldav")
+    calcurse_path = Path(cal_path, "calcurse")
 
     command = [
             "calcurse-caldav",
-            "--config", Path(cal_path, "config"),
-            "--datadir", Path(cal_path, "data"),
-            "--syncdb", Path(cal_path, "syncdb"),
-            "--lockfile", Path(cal_path, "lockfile"),
-            "--hookdir", Path(cal_path, "hook"),
+            "--datadir", calcurse_path,
+            "--config", Path(caldav_path, "config"),
+            "--syncdb", Path(caldav_path, "syncdb"),
+            "--lockfile", Path(caldav_path, "lockfile"),
+            "--hookdir", Path(caldav_path, "hook"),
             ]
 
     if init_type:
