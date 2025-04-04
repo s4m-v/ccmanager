@@ -1,10 +1,10 @@
 import sys
 import shutil
 import subprocess
-import time
 from pathlib import Path
 import os
 import logging
+from .sync import sync
 
 logger = logging.getLogger(__name__)
 
@@ -12,12 +12,13 @@ def gen_calcurse(path):
 
     path.mkdir()
 
-    process = subprocess.Popen(["calcurse", "-D", path],
-                               stdout=subprocess.DEVNULL)
-    time.sleep(1)
-
-    process.terminate()
-    process.wait()
+    try:
+        subprocess.run(["calcurse", "-D", path],
+                       stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL,
+                       timeout=1)
+    except subprocess.TimeoutExpired:
+        pass
 
 def create_caldav(config, path):
 
@@ -26,30 +27,8 @@ def create_caldav(config, path):
     Path(path, "hook").mkdir()
     shutil.copyfile(config, Path(path, "config"))
 
-def init_caldav(init_type, path):
-
-    print(init_type)
-
-    result = subprocess.run([
-        "calcurse-caldav",
-        "--init", f"{init_type}",
-        "--config", f"{Path(path, "config")}",
-        "--datadir", f"{Path(path, "data")}",
-        "--syncdb", f"{Path(path, "syncdb")}",
-        "--lockfile", f"{Path(path, "lockfile")}",
-        "--hookdir", f"{Path(path, "hook")}",
-        ], stderr=subprocess.PIPE)
-
-    if result.returncode:
-
-        logger.error("calcurse-caldav failed:")
-        logger.error(result.stderr.decode('utf-8'))
-
-        logger.info("Removing calendar...")
-        shutil.rmtree(Path(path, "..").resolve())
-
 def add(name, caldav_config='', dry_run=False, init_type="keep-remote",
-        data_dir=Path("$HOME/.ccmanager/")):
+        data_dir="$HOME/.ccmanager/"):
 
     # Add
     # This command will break into 3 parts
@@ -59,7 +38,7 @@ def add(name, caldav_config='', dry_run=False, init_type="keep-remote",
 
     logger.info("Starting add subcommand!")
 
-    cal_path = Path(os.path.expandvars(data_dir), name)
+    cal_path = Path(os.path.expandvars(data_dir), name).resolve()
 
     if cal_path.exists():
         logger.error("cal directory already exists")
@@ -77,16 +56,21 @@ def add(name, caldav_config='', dry_run=False, init_type="keep-remote",
     if caldav_config:
 
         caldav_config = os.path.expandvars(caldav_config)
-        caldav_path = Path(cal_path, "caldav")
 
         logger.info("creating caldav directoy and files...")
+
         if not dry_run:
             create_caldav(caldav_config, Path(cal_path, "caldav"))
+
         logger.info("done.")
 
         logger.info("Initializing caldav...")
+
         if not dry_run:
-            init_caldav(init_type, caldav_path)
+
+            if not sync(name, data_dir=data_dir, init_type=init_type):
+                shutil.rmtree(cal_path)
+
         logger.info("done.")
 
     logger.info("Add Subcommand Complete!")

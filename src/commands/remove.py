@@ -6,7 +6,7 @@ import sys
 
 logger = logging.getLogger(__name__)
 
-def remove(name, dry_run=False, data_dir=Path("$HOME/.ccmanager/")):
+def remove(name, dry_run=False, data_dir="$HOME/.ccmanager/"):
 
     logger.info("Starting remove command!")
 
