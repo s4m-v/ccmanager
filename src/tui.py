@@ -1,9 +1,7 @@
 import curses
 from curses.textpad import Textbox
 import commands
-import logging
 
-logger = logging.getLogger(__name__)
 
 class CalList:
 
@@ -236,8 +234,6 @@ class App:
 
             if c == curses.KEY_RESIZE:
 
-                logger.info("Handling Resize")
-
                 self.handle_resize()
 
                 continue
@@ -306,5 +302,4 @@ def main(stdscr: curses.window):
     app.run()
 
 def start_tui():
-    logging.basicConfig(filename="log", encoding="utf-8", level=logging.INFO)
     curses.wrapper(main)
