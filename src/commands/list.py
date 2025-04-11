@@ -18,8 +18,6 @@ def list(data_dir="$HOME/.ccmanager/"):
         if Path(ccm_path, dir, "calcurse").exists():
             valid_dir_list.append(dir)
 
-    print(*valid_dir_list, sep=", ")
-
     logger.info("calendars listed.")
 
     return valid_dir_list

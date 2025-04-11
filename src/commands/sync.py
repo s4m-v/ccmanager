@@ -33,15 +33,27 @@ def sync(name, data_dir="$HOME/.ccmanager/", init_type=''):
 
         logger.info("running caldav script.")
 
-    result = subprocess.run(
-            command, 
-            stderr=subprocess.PIPE,
-            text=True)
+    logger.info("arguments:")
+    logger.info(command)
+    try:
 
-    if result.returncode:
+        result = subprocess.run(
+                command, 
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=5
+                )
 
-        logger.error("calcurse-caldav failed:")
-        logger.error(result.stderr)
+        if result.returncode:
+
+            logger.error("calcurse-caldav failed:")
+            logger.error(result.stderr)
+
+            return False
+
+    except subprocess.TimeoutExpired:
+
+        logger.error("Couldn't connect to caldav server.")
 
         return False
 

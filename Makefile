@@ -1,6 +1,6 @@
-.PHONY: clean install
+.PHONY: clean install test
 
-./dist/ccmanager: .venv.timestamp ./src/*.py
+./dist/ccmanager: .venv.timestamp ./src/*.py ./src/commands/*.py
 	./venv/bin/pyinstaller -F --name=ccmanager ./src/main.py
 
 .venv.timestamp: requirements.txt
@@ -14,3 +14,6 @@ clean:
 
 install:
 	cp ./dist/ccmanager /usr/local/bin/ccmanager
+
+test: ./dist/ccmanager
+	./dist/ccmanager

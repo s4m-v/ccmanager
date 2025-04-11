@@ -24,7 +24,13 @@ def run_backup(args):
             )
 
 def run_list(args):
-    return commands.list(data_dir=args.data_dir)
+
+    try:
+        print(*commands.list(data_dir=args.data_dir), sep=", ")
+        return True
+    except Exception as e:
+        logger.error(e)
+        return False
 
 
 def run_open(args):
@@ -55,51 +61,47 @@ def init_parser():
     subparser = parser.add_subparsers()
 
     parser.add_argument('-v', '--verbose', action="store_true")
-    parser.add_argument("-D", "--data-dir", type=Path, 
-                            default=Path("$HOME/.ccmanager"))
+    parser.add_argument("-D", "--data-dir", type=Path, default=Path("$HOME/.ccmanager"))
 
     ### ADD
 
-    parser_add = subparser.add_parser("add")
+    parser_add = subparser.add_parser("add", help="add calendar")
     parser_add.set_defaults(func=run_add)
 
     parser_add.add_argument("name", type=str)
-    parser_add.add_argument("-C", "--caldav-conf", type=Path,
-                            default=None)
+    parser_add.add_argument("-C", "--caldav-conf", type=Path, default=None)
     parser_add.add_argument('-d', '--dry-run', action="store_true")
-    parser_add.add_argument('-i', '--init-type', default="keep-remote",
-                            choices=["keep-remote", "two-way", "keep-local"])
+    parser_add.add_argument('-i', '--init-type', default="keep-remote", choices=["keep-remote", "two-way", "keep-local"])
+
     ### REMOVE
 
-    parser_remove = subparser.add_parser("remove")
+    parser_remove = subparser.add_parser("remove", help="remove calendar")
     parser_remove.set_defaults(func=run_remove)
 
     parser_remove.add_argument("name", type=str)
     parser_remove.add_argument("-d", "--dry-run", action="store_true")
-    parser_remove.add_argument("-D", "--data-dir", type=Path, 
-                            default=Path("$HOME/.ccmanager"))
 
     ### open
 
-    parser_open = subparser.add_parser("open")
+    parser_open = subparser.add_parser("open", help="open calendar")
     parser_open.set_defaults(func=run_open)
     parser_open.add_argument("name", type=str)
 
     ### sync
 
-    parser_sync = subparser.add_parser("sync")
+    parser_sync = subparser.add_parser("sync", help="sync calendar")
     parser_sync.set_defaults(func=run_sync)
     parser_sync.add_argument("name", type=str)
 
     ### backup
 
-    parser_backup = subparser.add_parser("backup")
+    parser_backup = subparser.add_parser("backup", help="backup calendar")
     parser_backup.set_defaults(func=run_backup)
     parser_backup.add_argument("name", type=str)
 
     ### list
 
-    parser_list = subparser.add_parser("list")
+    parser_list = subparser.add_parser("list", help="list calendars")
     parser_list.set_defaults(func=run_list)
 
     return parser

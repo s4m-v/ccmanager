@@ -3,5 +3,6 @@ config
 venv/
 build/
 dist/
+log
 *.spec
 .venv.timestamp
