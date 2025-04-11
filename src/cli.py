@@ -44,7 +44,8 @@ def run_sync(args):
 
     return commands.sync(
             args.name,
-            data_dir=args.data_dir
+            data_dir=args.data_dir,
+            init_type=args.init_type
             )
 
 def run_remove(args):
@@ -92,6 +93,7 @@ def init_parser():
     parser_sync = subparser.add_parser("sync", help="sync calendar")
     parser_sync.set_defaults(func=run_sync)
     parser_sync.add_argument("name", type=str)
+    parser_sync.add_argument("-i", "--init-type", type=str)
 
     ### backup
 
